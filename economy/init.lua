@@ -222,7 +222,6 @@ minetest.register_node("economy:buy", {
 on_construct = function(pos)
     -- Shop buys at costbuy
     -- Shop sells at costsell
-    if player:get_player_name() == meta:get_string("owner") then
         local meta = minetest.env:get_meta(pos)
         meta:set_string("formspec", "size[8,6.6]"..
             "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;]"..
@@ -237,7 +236,6 @@ on_construct = function(pos)
         local inv = meta:get_inventory()
         inv:set_size("main", 8*4)
         meta:set_string("form", "yes")
-    end
 end,
 
 --retune
@@ -250,7 +248,6 @@ end,
         --~ minetest.chat_send_all(name)
 
         if player:get_player_name() == meta:get_string("owner") then
-        	local metas = minetest.env:get_meta(pos)
             meta:set_string("formspec", "size[8,6.6]"..
                 "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;${shopname}]"..
                 "field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV) :;${action}]"..
@@ -261,6 +258,9 @@ end,
                 "button_exit[3.1,6;2,1;button;Valide]")
             meta:set_string("infotext", "Boutique non validee")
             meta:set_string("form", "yes")
+        else
+        	meta:set_string("formspec", "")
+
         end
     end,
 
