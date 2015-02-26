@@ -21,6 +21,18 @@ end
 function exist(name)
     return argents[name] ~= nil
 end
+function sonsReussis(name)
+	minetest.sound_play("coin", {
+		to_player = name,
+		gain = 2.0,
+	})
+end
+function sonsErreur(name)
+	minetest.sound_play("error", {
+		to_player = name,
+		gain = 2.0,
+	})
+end
 
 
 
@@ -134,14 +146,8 @@ minetest.register_chatcommand("pay", {
 						argents[param[1]].argent = argents[param[1]].argent + param[2];
 						minetest.chat_send_player(name, "Vous avez paye : " .. param[2] .. nomMoney .. " a " .. param[1])
 						minetest.chat_send_player(param[1], name .. " vous a paye ".. param[2] .. nomMoney )
-						minetest.sound_play("mint_coin", {
-							to_player = player:get_player_name(),
-							gain = 2.0,
-						})
-						minetest.sound_play("mint_coin", {
-							to_player = param[1],
-							gain = 2.0,
-						})
+						sonsReussis(player:get_player_name())
+						sonsReussis(param[1])
 						changeMess(player:get_player_name())	
 						for _,player in ipairs(minetest.get_connected_players()) do
 							local name = player:get_player_name()
@@ -157,10 +163,12 @@ minetest.register_chatcommand("pay", {
             			io.close(output)
             		else
             			minetest.chat_send_player(name, "Le joueur n'existe pas !")
+            			sonsErreur(name)
             		end
             	else
             		argents[player:get_player_name()].argent = argents[player:get_player_name()].argent + param[2];
             		minetest.chat_send_player(name, "Vous n'avez pas assez d'argent ! \n Votre argent : " .. argents[player:get_player_name()].argent .. nomMoney)
+            		sonsErreur(name)
             	end
             end
 		end
@@ -258,7 +266,7 @@ on_construct = function(pos)
     end,
     allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
         local meta = minetest.env:get_meta(pos)
-        if not player:get_player_name() == meta:get_string("owner") then
+        if not (player:get_player_name() == meta:get_string("owner")) then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
@@ -271,7 +279,7 @@ on_construct = function(pos)
 
     allow_metadata_inventory_put = function(pos, listname, index, stack, player)
         local meta = minetest.env:get_meta(pos)
-       if not player:get_player_name() == meta:get_string("owner") then
+       if not (player:get_player_name() == meta:get_string("owner")) then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
@@ -283,7 +291,7 @@ on_construct = function(pos)
     allow_metadata_inventory_take = function(pos, listname, index, stack, player)
         local meta = minetest.env:get_meta(pos)
 
-       if not player:get_player_name() == meta:get_string("owner") then
+       if not (player:get_player_name() == meta:get_string("owner")) then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
@@ -376,15 +384,19 @@ on_construct = function(pos)
             local sender_inv = sender:get_inventory()
             if not inv:contains_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
                 minetest.chat_send_player(sender_name, "Il n'y a pas assez de marchandise dans la boutique !")
+                sonsErreur(sender_name)
                 return true
             elseif not sender_inv:room_for_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
                 minetest.chat_send_player(sender_name, "Votre inventaire est plein !")
+                sonsErreur(sender_name)
                 return true
             elseif get_money(sender_name) - tonumber(meta:get_string("costsell")) < 0 then
                 minetest.chat_send_player(sender_name, "Vous n'avez pas assez d'argent...")
+                sonsErreur(sender_name)
                 return true
             elseif not exist(meta:get_string("owner")) then
                 minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
+                sonsErreur(sender_name)
                 return true
             end
             set_money(sender_name, get_money(sender_name) - meta:get_string("costsell"))
@@ -392,6 +404,8 @@ on_construct = function(pos)
             sender_inv:add_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
             inv:remove_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
             minetest.chat_send_player(sender_name, "Vous avez achete " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney.. ".")
+            minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a achete " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney .. ".")
+            sonsReussis(sender_name)
         elseif fields["buttonsell"] then
             -- Shop buys, player sells: at costbuy: with buttonsell
             local sender_name = sender:get_player_name()
@@ -399,15 +413,19 @@ on_construct = function(pos)
             local sender_inv = sender:get_inventory()
             if not sender_inv:contains_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
                 minetest.chat_send_player(sender_name, "Vous n'avez pas assez de produit !")
+                sonsErreur(sender_name)
                 return true
             elseif not inv:room_for_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
                 minetest.chat_send_player(sender_name, "Il n'y a pas assez de place dans le shop, contactez le proprietaire pour qu'il le vide.")
+                sonsErreur(sender_name)
                 return true
             elseif get_money(meta:get_string("owner")) - meta:get_string("costbuy") < 0 then
                 minetest.chat_send_player(sender_name, "L'acheteur n'a pas assez d'argent.")
+                sonsErreur(sender_name)
                 return true
             elseif not exist(meta:get_string("owner")) then
                 minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
+                sonsErreur(sender_name)
                 return true
             end
             set_money(sender_name, get_money(sender_name) + meta:get_string("costbuy"))
@@ -415,6 +433,8 @@ on_construct = function(pos)
             sender_inv:remove_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
             inv:add_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
             minetest.chat_send_player(sender_name, "Vous avez vendu " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costbuy") .. " " .. nomMoney .. ".")
+            minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a vendu " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney .. ".")
+            sonsReussis(sender_name)
         end
     end,
 
