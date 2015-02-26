@@ -406,6 +406,14 @@ on_construct = function(pos)
             minetest.chat_send_player(sender_name, "Vous avez achete " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney.. ".")
             minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a achete " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney .. ".")
             sonsReussis(sender_name)
+            sonsReussis(meta:get_string("owner"))
+            changeMess(sender_name)	
+						for _,player in ipairs(minetest.get_connected_players()) do
+							local name = player:get_player_name()
+							if name == meta:get_string("owner") then
+								changeMess(name)
+							end
+						end
         elseif fields["buttonsell"] then
             -- Shop buys, player sells: at costbuy: with buttonsell
             local sender_name = sender:get_player_name()
@@ -435,6 +443,14 @@ on_construct = function(pos)
             minetest.chat_send_player(sender_name, "Vous avez vendu " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costbuy") .. " " .. nomMoney .. ".")
             minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a vendu " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney .. ".")
             sonsReussis(sender_name)
+            sonsReussis(meta:get_string("owner"))
+            changeMess(sender_name)	
+						for _,player in ipairs(minetest.get_connected_players()) do
+							local name = player:get_player_name()
+							if name == meta:get_string("owner") then
+								changeMess(name)
+							end
+						end
         end
     end,
 
