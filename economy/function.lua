@@ -1,21 +1,34 @@
-local function loadEconomy()
-    local input = io.open(homes_file, "r")
-    if input then
-		repeat
-            local x = input:read("*n")
-            if x == nil then
-            	break
-            end
-            local name = input:read("*l")
-            argents[name:sub(2)] = {argent = x}
-        until input:read(0) == nil
-        io.close(input)
-    else
-        argents = {}
+function save_accounts()
+    local output = io.open(homes_file, "w")
+	for i, v in pairs(argents) do
+            	output:write(v.argent.." "..i.."\n")
     end
+    io.close(output)
+end
+function set_money(name, amount)
+    argents[name].argent = amount
+    save_accounts()
+end
+function get_money(name)
+    return argents[name].argent
+end
+function exist(name)
+    return argents[name] ~= nil
+end
+function sonsReussis(name)
+	minetest.sound_play("coin", {
+		to_player = name,
+		gain = 2.0,
+	})
+end
+function sonsErreur(name)
+	minetest.sound_play("error", {
+		to_player = name,
+		gain = 2.0,
+	})
 end
 
-local function changeMess(pseudo)
+function changeMess(pseudo)
 	local player = minetest.get_player_by_name(pseudo)
 	player:hud_remove(idx)
 	idx = player:hud_add({
@@ -26,17 +39,4 @@ local function changeMess(pseudo)
 		text = "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney
 	})
 	
-end
-
-
-function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
 end

@@ -1,38 +1,11 @@
-local homes_file = minetest.get_worldpath() .. "/economy"
+homes_file = minetest.get_worldpath() .. "/economy"
+
 argents = {}
-local nomMoney = " Francs"
-local argentBase=200
+nomMoney = " Francs"
+argentBase=200
 local idx
 
-function save_accounts()
-    local output = io.open(homes_file, "w")
-	for i, v in pairs(argents) do
-            	output:write(v.argent.." "..i.."\n")
-    end
-    io.close(output)
-end
-function set_money(name, amount)
-    argents[name].argent = amount
-    save_accounts()
-end
-function get_money(name)
-    return argents[name].argent
-end
-function exist(name)
-    return argents[name] ~= nil
-end
-function sonsReussis(name)
-	minetest.sound_play("coin", {
-		to_player = name,
-		gain = 2.0,
-	})
-end
-function sonsErreur(name)
-	minetest.sound_play("error", {
-		to_player = name,
-		gain = 2.0,
-	})
-end
+dofile(minetest.get_modpath("economy").."/function.lua")
 
 
 
@@ -56,19 +29,6 @@ local function loadEconomy()
     end
 end
 
-local function changeMess(pseudo)
-	local player = minetest.get_player_by_name(pseudo)
-	player:hud_remove(idx)
-	idx = player:hud_add({
-		hud_elem_type = "text",
-		position = {x = 1, y = 0},
-		offset = {x=-100, y = 20},
-		scale = {x = 100, y = 100},
-		text = "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney
-	})
-	
-end
-
 
 function explode(div,str)
   if (div=='') then return false end
@@ -89,44 +49,7 @@ minetest.register_on_joinplayer(function(player)
 	changeMess(player:get_player_name())
 end)
 
-minetest.register_on_newplayer(function(player)
-	minetest.chat_send_player(player:get_player_name(), "Bienvenue vous avez " .. argentBase .. nomMoney .. " de base !")
-	argents[player:get_player_name()] = {argent = argentBase}
-	local output = io.open(homes_file, "w")
-	for i, v in pairs(argents) do
-             output:write(v.argent.." "..i.."\n")
-          end
-          io.close(output)
-
-    idx = player:hud_add({
-		hud_elem_type = "text",
-		position = {x = 1, y = 0},
-		offset = {x=-100, y = 20},
-		scale = {x = 100, y = 100},
-		text = "Bienvenue " .. player:get_player_name() .. "\n" .. "Portefeuille ".. argents[player:get_player_name()].argent .. nomMoney
-	})
-end)
-
-minetest.register_node(":default:sapling", {
-	description = "Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles ={"default_sapling.png"},
-	inventory_image = "default_sapling.png",
-	wield_image = "default_sapling.png",
-	paramtype = "light",
-	walkable = false,
-	groups = {snappy=2,dig_immediate=3,attached_node=1},
-	sounds = default.node_sound_defaults(),
-	after_place_node = function(pos, placer)
-		set_money(placer:get_player_name(), argents[placer:get_player_name()].argent + 1)   
-		changeMess(placer:get_player_name())     
-    end,
-    on_punch = function( pos, node, player )
-		set_money(player:get_player_name(), argents[player:get_player_name()].argent - 1)    
-		changeMess(player:get_player_name())    
-    end,
-})
+dofile(minetest.get_modpath("economy").."/actionAjouterArgent.lua")
 
 
 
