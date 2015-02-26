@@ -190,7 +190,7 @@ minetest.register_craftitem("economy:pounds", {
 
 
 minetest.register_node("economy:buy", {
-	description = "Clique droit sur objet",
+	description = "Utiliser pour vendre des objets",
 	tiles = {
 		"iron.png",
 		"iron.png",
@@ -258,12 +258,12 @@ on_construct = function(pos)
     end,
     allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
         local meta = minetest.env:get_meta(pos)
-        if not has_shop_privilege(meta, player) then
+        if not player:get_player_name() == meta:get_string("owner") then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
                     minetest.pos_to_string(pos))
-            return 0
+           return 0
         end
         return count
     end,
@@ -271,23 +271,24 @@ on_construct = function(pos)
 
     allow_metadata_inventory_put = function(pos, listname, index, stack, player)
         local meta = minetest.env:get_meta(pos)
-        if not has_shop_privilege(meta, player) then
+       if not player:get_player_name() == meta:get_string("owner") then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
                     minetest.pos_to_string(pos))
-            return 0
+           return 0
         end
         return stack:get_count()
     end,
     allow_metadata_inventory_take = function(pos, listname, index, stack, player)
         local meta = minetest.env:get_meta(pos)
-        if not has_shop_privilege(meta, player) then
+
+       if not player:get_player_name() == meta:get_string("owner") then
             minetest.log("action", player:get_player_name()..
                     " tried to access a shop belonging to "..
                     meta:get_string("owner").." at "..
                     minetest.pos_to_string(pos))
-            return 0
+           return 0
         end
         return stack:get_count()
     end,
@@ -308,7 +309,8 @@ on_construct = function(pos)
     on_receive_fields = function(pos, formname, fields, sender)
         local meta = minetest.env:get_meta(pos)
         if meta:get_string("form") == "yes" then
-            if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 and (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"]) then
+        	-- (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"])
+            if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 then
                 if fields.action == "A" then
                     if not tonumber(fields.costbuy) then
                         return
