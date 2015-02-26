@@ -85,7 +85,6 @@ end
 
 loadEconomy()
 
-
 minetest.register_on_joinplayer(function(player)
 	changeMess(player:get_player_name())
 end)
@@ -107,6 +106,27 @@ minetest.register_on_newplayer(function(player)
 		text = "Bienvenue " .. player:get_player_name() .. "\n" .. "Portefeuille ".. argents[player:get_player_name()].argent .. nomMoney
 	})
 end)
+
+minetest.register_node(":default:sapling", {
+	description = "Sapling",
+	drawtype = "plantlike",
+	visual_scale = 1.0,
+	tiles ={"default_sapling.png"},
+	inventory_image = "default_sapling.png",
+	wield_image = "default_sapling.png",
+	paramtype = "light",
+	walkable = false,
+	groups = {snappy=2,dig_immediate=3,attached_node=1},
+	sounds = default.node_sound_defaults(),
+	after_place_node = function(pos, placer)
+		set_money(placer:get_player_name(), argents[placer:get_player_name()].argent + 1)   
+		changeMess(placer:get_player_name())     
+    end,
+    on_punch = function( pos, node, player )
+		set_money(player:get_player_name(), argents[player:get_player_name()].argent - 1)    
+		changeMess(player:get_player_name())    
+    end,
+})
 
 
 
@@ -461,6 +481,30 @@ end,
    
  })
 
+minetest.register_node("economy:blocFerRenforce", {
+	tiles = {"iron.png"},
+	groups = {cracky = 1},
+})
+
+
+
+minetest.register_craft({
+	output = "economy:blocFerRenforce 1",
+	recipe = {
+	{'default:steelblock', 'default:steelblock', 'default:steelblock'},
+	{'default:steelblock', 'default:diamond', 'default:steelblock'},
+	{'default:steelblock', 'default:steelblock', 'default:steelblock'},
+}
+})
+
+minetest.register_craft({
+	output = "economy:buy 1",
+	recipe = {
+	{'economy:blocFerRenforce', 'economy:blocFerRenforce', 'economy:blocFerRenforce'},
+	{'economy:blocFerRenforce', 'default:diamond', 'economy:blocFerRenforce'},
+	{'economy:blocFerRenforce', 'economy:blocFerRenforce', 'economy:blocFerRenforce'},
+}
+	})
 minetest.register_craft({
 	output= 'economy:shillings 1',
 	recipe = {
