@@ -258,9 +258,6 @@ end,
                 "button_exit[3.1,6;2,1;button;Valide]")
             meta:set_string("infotext", "Boutique non validee")
             meta:set_string("form", "yes")
-        else
-        	meta:set_string("formspec", "")
-
         end
     end,
 
