@@ -1,6 +1,6 @@
 local homes_file = minetest.get_worldpath() .. "/economy"
 argents = {}
-local nomMoney = " euros"
+local nomMoney = " franc"
 local argentBase=200
 local idx
 
