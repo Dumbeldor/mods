@@ -4,6 +4,29 @@ local nomMoney = " Francs"
 local argentBase=200
 local idx
 
+function save_accounts()
+    local output = io.open(homes_file, "w")
+	for i, v in pairs(argents) do
+            	output:write(v.argent.." "..i.."\n")
+    end
+    io.close(output)
+end
+function set_money(name, amount)
+    argents[name].argent = amount
+    save_accounts()
+end
+function get_money(name)
+    return argents[name].argent
+end
+function exist(name)
+    return argents[name] ~= nil
+end
+
+
+
+--End.
+
+
 local function loadEconomy()
     local input = io.open(homes_file, "r")
     if input then
@@ -145,21 +168,258 @@ minetest.register_chatcommand("pay", {
     end,
 })
 
+--[[
+	Création des blocks !
+...]]
+
 minetest.register_craftitem("economy:pences", {
 	description = "Minetoon pence",
-	inventory_image = "mint_goldcoin.png",
+	inventory_image = "goldcoin.png",
 })
 -- Shilling equals 1/9 pounds, 9 pence or 1/81 gold ingot
 minetest.register_craftitem("economy:shillings", {
 	description = "Minetoon shilling",
-	inventory_image = "mint_9goldcoin.png",
+	inventory_image = "9goldcoin.png",
 })
 -- Pound equals 1/9 gold ingot, 9 shilling or 81 pence)
 minetest.register_craftitem("economy:pounds", {
 	description = "Minetoon pounds",
-	inventory_image = "mint_81goldcoin.png",
+	inventory_image = "81goldcoin.png",
 })
 
+
+
+minetest.register_node("economy:buy", {
+	description = "Clique droit sur objet",
+	tiles = {
+		"iron.png",
+		"iron.png",
+		"buy.png",
+		"buy.png",
+		"buy.png",
+		"buy.png"
+		},
+	groups = {cracky = 1},
+	after_place_node = function(pos, placer)
+		local meta = minetest.get_meta(pos)
+        meta:set_string("owner", placer:get_player_name())
+        meta:set_string("infotext", "Shop (owned par " .. placer:get_player_name() .. ")")
+    end,
+
+on_construct = function(pos)
+    -- Shop buys at costbuy
+    -- Shop sells at costsell
+        local meta = minetest.env:get_meta(pos)
+        meta:set_string("formspec", "size[8,6.6]"..
+            "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;]"..
+            "field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV):;]"..
+            "field[0.256,2.5;8,1;nodename;Le nom du block/item que vous voulez acheter (Nom exacte):;]"..
+            "field[0.256,3.5;8,1;amount;Par combien vous voulez acheter :;]"..
+            "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;]"..
+            "field[0.256,5.5;8,1;costsell;Le montant de vente:;]"..
+            "button_exit[3.1,6;2,1;button;Valide]")
+        meta:set_string("infotext", "Boutique non validee")
+        meta:set_string("owner", "")
+        local inv = meta:get_inventory()
+        inv:set_size("main", 8*4)
+        meta:set_string("form", "yes")
+    end,
+
+--retune
+
+    on_punch = function( pos, node, player )
+    -- Shop buys at costbuy
+    -- Shop sells at costsell
+        local meta = minetest.env:get_meta(pos)
+        --~ minetest.chat_send_all("Shop punched.")
+        --~ minetest.chat_send_all(name)
+
+        if player:get_player_name() == meta:get_string("owner") then
+        	local metas = minetest.env:get_meta(pos)
+            meta:set_string("formspec", "size[8,6.6]"..
+                "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;${shopname}]"..
+                "field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV) :;${action}]"..
+                "field[0.256,2.5;8,1;nodename;Le nom du block/item que vous voulez acheter (Nom exacte) :;${nodename}]"..
+                "field[0.256,3.5;8,1;amount;Par combien vous voulez acheter :;${amount}]"..
+                "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;${costbuy}]"..
+                "field[0.256,5.5;8,1;costsell;Le montant de vente :;${costsell}]"..
+                "button_exit[3.1,6;2,1;button;Valide]")
+            meta:set_string("infotext", "Boutique non validee")
+            meta:set_string("form", "yes")
+
+            minetest.chat_send_player( player:get_player_name(), "Shop detuned." .. meta:get_string("owner"))
+        end
+    end,
+
+    can_dig = function(pos,player)
+        local meta = minetest.env:get_meta(pos);
+        local inv = meta:get_inventory()
+        return inv:is_empty("main") and (meta:get_string("owner") == player:get_player_name() or minetest.get_player_privs(player:get_player_name())["money_admin"])
+    end,
+    allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+        local meta = minetest.env:get_meta(pos)
+        if not has_shop_privilege(meta, player) then
+            minetest.log("action", player:get_player_name()..
+                    " tried to access a shop belonging to "..
+                    meta:get_string("owner").." at "..
+                    minetest.pos_to_string(pos))
+            return 0
+        end
+        return count
+    end,
+
+
+    allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+        local meta = minetest.env:get_meta(pos)
+        if not has_shop_privilege(meta, player) then
+            minetest.log("action", player:get_player_name()..
+                    " tried to access a shop belonging to "..
+                    meta:get_string("owner").." at "..
+                    minetest.pos_to_string(pos))
+            return 0
+        end
+        return stack:get_count()
+    end,
+    allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+        local meta = minetest.env:get_meta(pos)
+        if not has_shop_privilege(meta, player) then
+            minetest.log("action", player:get_player_name()..
+                    " tried to access a shop belonging to "..
+                    meta:get_string("owner").." at "..
+                    minetest.pos_to_string(pos))
+            return 0
+        end
+        return stack:get_count()
+    end,
+
+    on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
+        minetest.log("action", player:get_player_name()..
+                " moves stuff in shop at "..minetest.pos_to_string(pos))
+    end,
+    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+        minetest.log("action", player:get_player_name()..
+                " moves stuff to shop at "..minetest.pos_to_string(pos))
+    end,
+    on_metadata_inventory_take = function(pos, listname, index, count, player)
+        minetest.log("action", player:get_player_name()..
+                " takes stuff from shop at "..minetest.pos_to_string(pos))
+    end,
+
+    on_receive_fields = function(pos, formname, fields, sender)
+        local meta = minetest.env:get_meta(pos)
+        if meta:get_string("form") == "yes" then
+            if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 and (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"]) then
+                if fields.action == "A" then
+                    if not tonumber(fields.costbuy) then
+                        return
+                    end
+                    if not (tonumber(fields.costbuy) >= 0) then
+                        return
+                    end
+                end
+                if fields.action == "V" then
+                    if not tonumber(fields.costsell) then
+                        return
+                    end
+                    if not (tonumber(fields.costsell) >= 0) then
+                        return
+                    end
+                end
+                if fields.action == "AV" then
+                    if not tonumber(fields.costbuy) then
+                        return
+                    end
+                    if not (tonumber(fields.costbuy) >= 0) then
+                        return
+                    end
+                    if not tonumber(fields.costsell) then
+                        return
+                    end
+                    if not (tonumber(fields.costsell) >= 0) then
+                        return
+                    end
+                end
+                local s, ss
+                if fields.action == "A" then
+                -- Shop buys, player sells: at costbuy
+                    s = " vendre "
+                    ss = "button[1,5;2,1;buttonsell;Vendre("..fields.costbuy..")]"
+                elseif fields.action == "V" then
+                -- Shop sells, player buys: at costsell
+                    s = " acheter "
+                    ss = "button[1,5;2,1;buttonbuy;Acheter("..fields.costsell..")]"
+                else
+                    s = " vendre et acheter "
+                    ss = "button[1,5;2,1;buttonbuy;Acheter("..fields.costsell..")]" .. "button[5,5;2,1;buttonsell;Vendre("..fields.costbuy..")]"
+                end
+                local meta = minetest.env:get_meta(pos)
+                meta:set_string("formspec", "size[8,10;]"..
+                    "list[context;main;0,0;8,4;]"..
+                    "label[0.256,4.5;Vous pouvez vendre "..s..fields.amount.." "..fields.nodename.."]"..
+                    ss..
+                    "list[current_player;main;0,6;8,4;]")
+                meta:set_string("shopname", fields.shopname)
+                meta:set_string("action", fields.action)
+                meta:set_string("nodename", fields.nodename)
+                meta:set_string("amount", fields.amount)
+                meta:set_string("costbuy", fields.costbuy)
+                meta:set_string("costsell", fields.costsell)
+                meta:set_string("infotext", "Shop \"" .. fields.shopname .. "\" (owned par " .. meta:get_string("owner") .. ")")
+                meta:set_string("form", "no")
+            end
+        elseif fields["buttonbuy"] then
+        -- Shop sells, player buys: at costsell: with buttonbuy
+            local sender_name = sender:get_player_name()
+            local inv = meta:get_inventory()
+            local sender_inv = sender:get_inventory()
+            if not inv:contains_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
+                minetest.chat_send_player(sender_name, "Il n'y a pas assez de marchandise dans la boutique !")
+                return true
+            elseif not sender_inv:room_for_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
+                minetest.chat_send_player(sender_name, "Votre inventaire est plein !")
+                return true
+            elseif get_money(sender_name) - tonumber(meta:get_string("costsell")) < 0 then
+                minetest.chat_send_player(sender_name, "Vous n'avez pas assez d'argent...")
+                return true
+            elseif not exist(meta:get_string("owner")) then
+                minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
+                return true
+            end
+            set_money(sender_name, get_money(sender_name) - meta:get_string("costsell"))
+            set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) + meta:get_string("costsell"))
+            sender_inv:add_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
+            inv:remove_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
+            minetest.chat_send_player(sender_name, "Vous avez achete " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney.. ".")
+        elseif fields["buttonsell"] then
+            -- Shop buys, player sells: at costbuy: with buttonsell
+            local sender_name = sender:get_player_name()
+            local inv = meta:get_inventory()
+            local sender_inv = sender:get_inventory()
+            if not sender_inv:contains_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
+                minetest.chat_send_player(sender_name, "Vous n'avez pas assez de produit !")
+                return true
+            elseif not inv:room_for_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount")) then
+                minetest.chat_send_player(sender_name, "Il n'y a pas assez de place dans le shop, contactez le proprietaire pour qu'il le vide.")
+                return true
+            elseif get_money(meta:get_string("owner")) - meta:get_string("costbuy") < 0 then
+                minetest.chat_send_player(sender_name, "L'acheteur n'a pas assez d'argent.")
+                return true
+            elseif not exist(meta:get_string("owner")) then
+                minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
+                return true
+            end
+            set_money(sender_name, get_money(sender_name) + meta:get_string("costbuy"))
+            set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) - meta:get_string("costbuy"))
+            sender_inv:remove_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
+            inv:add_item("main", meta:get_string("nodename") .. " " .. meta:get_string("amount"))
+            minetest.chat_send_player(sender_name, "Vous avez vendu " .. meta:get_string("amount") .. " " .. meta:get_string("nodename") .. " pour " .. meta:get_string("costbuy") .. " " .. nomMoney .. ".")
+        end
+    end,
+
+--end retune
+
+   
+ })
 
 minetest.register_craft({
 	output= 'economy:shillings 1',
@@ -190,4 +450,9 @@ minetest.register_craft({
 			}
 	})
 
+
+
+--[[
+Gestion interaction avec blocks
+...]]
 
