@@ -9,7 +9,7 @@ end
 
 
 minetest.register_node("handmill:handmill", {
-  description = S("moulin à main, actionner en tapant"),
+  description = S("moulin a main, actionner en tapant"),
   drawtype ="mesh",
   mesh = "handmill.obj",
   tiles = {"default_stone.png"},
@@ -34,7 +34,7 @@ minetest.register_node("handmill:handmill", {
   
   on_construct = function(pos)
     local meta = minetest.get_meta(pos);
-    meta:set_string("infotext", S("moulin à main, utilisation en tapant"));
+    meta:set_string("infotext", S("moulin a main, utilisation en tapant"));
     local inv = meta:get_inventory();
     inv:set_size("seeds", 1);
     inv:set_size("flour", 4);
@@ -43,17 +43,17 @@ minetest.register_node("handmill:handmill", {
   after_place_node = function(pos, placer)
     local meta = minetest.get_meta(pos);
     meta:set_string("owner", placer:get_player_name() or "");
-    meta:set_string("infotext", S("Moulin à main, actionner en tapant (possédé par %s)"):format(meta:get_string("owner") or ""));
+    meta:set_string("infotext", S("Moulin a main, actionner en tapant (Prorietaire: %s)"):format(meta:get_string("owner") or ""));
     meta:set_string("formspec",
       "size[8,8]"..
       "image[0,1;1,1;farming_wheat_seed.png]"..
       "list[current_name;seeds;1,1;1,1;]"..
       "list[current_name;flour;5,1;2,2;]"..
-      "label[0.5,0.5;"..S("Graines de blé:").."]"..
+      "label[0.5,0.5;"..S("Graines de ble:").."]"..
       "label[4,0.5;"..S("Farine:").."]"..
       "label[0,-0.2;"..S("Moulin").."]"..
-      "label[2.5,-0.2;"..S("Propriétaire: %s"):format(meta:get_string('owner') or "").."]"..
-      "label[0,2.5;"..S("Tape ce moulin à main").."]"..
+      "label[2.5,-0.2;"..S("Proprietaire: %s"):format(meta:get_string('owner') or "").."]"..
+      "label[0,2.5;"..S("Tapez ce moulin a main").."]"..
       "label[0,3.0;"..S("pour convertir les grains en farine.").."]"..
       "list[current_player;main;0,4;8,4;]");
     end,
@@ -129,9 +129,9 @@ minetest.register_node("handmill:handmill", {
       inv:remove_item("seeds", 'farming:seed_wheat '..tostring( anz ));
       local anz_left = found - anz;
 	if( anz_left > 0 ) then
-	  minetest.chat_send_player( name, S('Vous avez moulu %s grains de blé (%s restants).'):format(anz,anz_left));
+	  minetest.chat_send_player( name, S('Vous avez moulu %s grains de ble (%s restants).'):format(anz,anz_left));
 	else
-	  minetest.chat_send_player( name, S('Vous avez moulu les %s dernières graines de blé.'):format(anz));
+	  minetest.chat_send_player( name, S('Vous avez moulu les %s dernières graines de ble.'):format(anz));
 	end
 	-- Si la version de minetest est recente, on fait tourner le moulin
 	if( minetest.swap_node ) then
