@@ -254,8 +254,6 @@ on_construct = function(pos)
                 "button_exit[3.1,6;2,1;button;Valide]")
             meta:set_string("infotext", "Boutique non validee")
             meta:set_string("form", "yes")
-
-            minetest.chat_send_player( player:get_player_name(), "Shop detuned." .. meta:get_string("owner"))
         end
     end,
 
@@ -318,7 +316,7 @@ on_construct = function(pos)
         local meta = minetest.env:get_meta(pos)
         if meta:get_string("form") == "yes" then
         	-- (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"])
-            if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 then
+            if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 and meta:get_string("owner") == sender:get_player_name() then
                 if fields.action == "A" then
                     if not tonumber(fields.costbuy) then
                         return
