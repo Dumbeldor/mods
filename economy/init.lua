@@ -140,34 +140,39 @@ minetest.register_chatcommand("pay", {
 		else
 
 			if argents[player:get_player_name()] then
-				argents[player:get_player_name()].argent = argents[player:get_player_name()].argent - param[2];
-				if argents[player:get_player_name()].argent > 0 then
-					if argents[param[1]] then
-						argents[param[1]].argent = argents[param[1]].argent + param[2];
-						minetest.chat_send_player(name, "Vous avez paye : " .. param[2] .. nomMoney .. " a " .. param[1])
-						minetest.chat_send_player(param[1], name .. " vous a paye ".. param[2] .. nomMoney )
-						sonsReussis(player:get_player_name())
-						sonsReussis(param[1])
-						changeMess(player:get_player_name())	
-						for _,player in ipairs(minetest.get_connected_players()) do
-							local name = player:get_player_name()
-							if name == param[1] then
-								changeMess(name)
+				if type(tonumber(param[2], 2)) == "number" then
+					argents[player:get_player_name()].argent = argents[player:get_player_name()].argent - param[2];
+					if argents[player:get_player_name()].argent >= 0 then
+						if argents[param[1]] then
+							argents[param[1]].argent = argents[param[1]].argent + param[2];
+							minetest.chat_send_player(name, "Vous avez paye : " .. param[2] .. nomMoney .. " a " .. param[1])
+							minetest.chat_send_player(param[1], name .. " vous a paye ".. param[2] .. nomMoney )
+							sonsReussis(player:get_player_name())
+							sonsReussis(param[1])
+							changeMess(player:get_player_name())	
+							for _,player in ipairs(minetest.get_connected_players()) do
+								local name = player:get_player_name()
+								if name == param[1] then
+									changeMess(name)
+								end
 							end
-						end
 
-						local output = io.open(homes_file, "w")
-						for i, v in pairs(argents) do
-                		output:write(v.argent.." "..i.."\n")
+							local output = io.open(homes_file, "w")
+							for i, v in pairs(argents) do
+                			output:write(v.argent.." "..i.."\n")
+            				end
+            				io.close(output)
+            			else
+            				minetest.chat_send_player(name, "Le joueur n'existe pas !")
+            				sonsErreur(name)
             			end
-            			io.close(output)
             		else
-            			minetest.chat_send_player(name, "Le joueur n'existe pas !")
+            			argents[player:get_player_name()].argent = argents[player:get_player_name()].argent + param[2];
+            			minetest.chat_send_player(name, "Vous n'avez pas assez d'argent ! \n Votre argent : " .. argents[player:get_player_name()].argent .. nomMoney)
             			sonsErreur(name)
             		end
             	else
-            		argents[player:get_player_name()].argent = argents[player:get_player_name()].argent + param[2];
-            		minetest.chat_send_player(name, "Vous n'avez pas assez d'argent ! \n Votre argent : " .. argents[player:get_player_name()].argent .. nomMoney)
+            		minetest.chat_send_player(name, "La somme doit etre un nombre ! \n Usage : /pay nomDuJoueur Somme")
             		sonsErreur(name)
             	end
             end
@@ -217,6 +222,7 @@ minetest.register_node("economy:buy", {
 on_construct = function(pos)
     -- Shop buys at costbuy
     -- Shop sells at costsell
+    if player:get_player_name() == meta:get_string("owner") then
         local meta = minetest.env:get_meta(pos)
         meta:set_string("formspec", "size[8,6.6]"..
             "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;]"..
@@ -231,7 +237,8 @@ on_construct = function(pos)
         local inv = meta:get_inventory()
         inv:set_size("main", 8*4)
         meta:set_string("form", "yes")
-    end,
+    end
+end,
 
 --retune
 
