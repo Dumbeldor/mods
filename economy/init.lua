@@ -5,11 +5,12 @@ nomMoney = " Francs"
 argentBase=200
 local idx
 
+--Chargé les functions 
+
 dofile(minetest.get_modpath("economy").."/function.lua")
 
 
 
---End.
 
 
 local function loadEconomy()
@@ -35,10 +36,10 @@ function explode(div,str)
   local pos,arr = 0,{}
   -- for each divider found
   for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
+    table.insert(arr,string.sub(str,pos,st-1))
+    pos = sp + 1 
   end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+  table.insert(arr,string.sub(str,pos)) 
   return arr
 end
 
@@ -166,15 +167,16 @@ on_construct = function(pos)
     -- Shop buys at costbuy
     -- Shop sells at costsell
         local meta = minetest.env:get_meta(pos)
-        meta:set_string("formspec", "size[8,6.6]"..
+        meta:set_string("formspec", "size[8,7]"..
             "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;]"..
             "field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV):;]"..
             "field[0.256,2.5;8,1;nodename;Le nom du block/item que vous voulez acheter (Nom exacte):;]"..
             "field[0.256,3.5;8,1;amount;Par combien vous voulez acheter :;]"..
             "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;]"..
             "field[0.256,5.5;8,1;costsell;Le montant de vente:;]"..
-            "button_exit[3.1,6;2,1;button;Valide]")
-        meta:set_string("infotext", "Boutique non validee")
+            "button[1,6.5;2,1;button;Valider]"..
+                "button[5,6.5;2,1;supprimer;Supprimer boutique]")
+        meta:set_string("infotext", "Boutique fermee")
         meta:set_string("owner", "")
         local inv = meta:get_inventory()
         inv:set_size("main", 8*4)
@@ -182,6 +184,10 @@ on_construct = function(pos)
 end,
 
 --retune
+    after_destruct = function(pos, oldnode)
+    	minetest.remove_node(pos)
+    	return 0
+    end,
 
     on_punch = function( pos, node, player )
     -- Shop buys at costbuy
@@ -191,18 +197,23 @@ end,
         --~ minetest.chat_send_all(name)
 
         if player:get_player_name() == meta:get_string("owner") then
-            meta:set_string("formspec", "size[8,6.6]"..
+            meta:set_string("formspec", "size[8,7]"..
                 "field[0.256,0.5;8,1;shopname;Le nom de votre shop :;${shopname}]"..
                 "field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV) :;${action}]"..
                 "field[0.256,2.5;8,1;nodename;Le nom du block/item que vous voulez acheter (Nom exacte) :;${nodename}]"..
                 "field[0.256,3.5;8,1;amount;Par combien vous voulez acheter :;${amount}]"..
                 "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;${costbuy}]"..
                 "field[0.256,5.5;8,1;costsell;Le montant de vente :;${costsell}]"..
-                "button_exit[3.1,6;2,1;button;Valide]")
-            meta:set_string("infotext", "Boutique non validee")
+                "button[1,6.5;2,1;button;Valider]"..
+                "button[5,6.5;2,1;supprimer;Supprimer boutique]")
+            
+
+            meta:set_string("infotext", "Boutique fermee")
             meta:set_string("form", "yes")
         end
     end,
+
+
 
     can_dig = function(pos,player)
         local meta = minetest.env:get_meta(pos);
@@ -261,7 +272,12 @@ end,
 
     on_receive_fields = function(pos, formname, fields, sender)
         local meta = minetest.env:get_meta(pos)
-        if meta:get_string("form") == "yes" then
+        if fields["supprimer"] then
+            	minetest.remove_node(pos)
+            	 meta:set_string("formspec", "size[4,5;]"..
+                    "label[0,0;Votre boutique a bien ete supprime !]")
+            
+        elseif meta:get_string("form") == "yes" then
         	-- (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"])
             if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and minetest.registered_items[fields.nodename] and tonumber(fields.amount) and tonumber(fields.amount) >= 1 and meta:get_string("owner") == sender:get_player_name() then
                 if fields.action == "A" then
