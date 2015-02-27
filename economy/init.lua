@@ -186,7 +186,7 @@ on_construct = function(pos)
             "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;]"..
             "field[0.256,5.5;8,1;costsell;Le montant de vente:;]"..
             "button[1,6.5;2,1;button;Valider]"..
-                "button[5,6.5;2,1;supprimer;Supprimer boutique]")
+                "button[5,6.5;2,1;reset;Reset]")
         meta:set_string("infotext", "Boutique fermee")
         meta:set_string("owner", "")
         local inv = meta:get_inventory()
@@ -216,7 +216,7 @@ end,
                 "field[0.256,4.5;8,1;costbuy;Le montant d'achat:;${costbuy}]"..
                 "field[0.256,5.5;8,1;costsell;Le montant de vente :;${costsell}]"..
                 "button[1,6.5;2,1;button;Valider]"..
-                "button[5,6.5;2,1;supprimer;Supprimer boutique]")
+                "button[5,6.5;2,1;reset;Reset]")
             
 
             meta:set_string("infotext", "Boutique fermee")
@@ -283,11 +283,23 @@ end,
 
     on_receive_fields = function(pos, formname, fields, sender)
         local meta = minetest.env:get_meta(pos)
-        if fields["supprimer"] then
+        if fields["reset"] then
         	if meta:get_string("owner") == sender:get_player_name() then
-            	minetest.remove_node(pos)
-            	 meta:set_string("formspec", "size[4,5;]"..
-                    "label[0,0;Votre boutique a bien ete supprime !]")
+            	 local meta = minetest.env:get_meta(pos)
+       				 meta:set_string("formspec", "size[8,7]"..
+            		"field[0.256,0.5;8,1;shopname;Le nom de votre shop :;]"..
+            		"field[0.256,1.5;8,1;action;Vous voulez acheter(A), vendre(V) ou acheter et vendre(AV):;]"..
+            		"field[0.256,2.5;8,1;nodename;Le nom du block/item que vous voulez acheter (Nom exacte):;]"..
+            		"field[0.256,3.5;8,1;amount;Par combien vous voulez acheter :;]"..
+            		"field[0.256,4.5;8,1;costbuy;Le montant d'achat:;]"..
+            		"field[0.256,5.5;8,1;costsell;Le montant de vente:;]"..
+            		"button[1,6.5;2,1;button;Valider]"..
+                		"button[5,6.5;2,1;reset;Reset]")
+        		meta:set_string("infotext", "Boutique fermee")
+        		meta:set_string("owner", "")
+        		local inv = meta:get_inventory()
+        		inv:set_size("main", 8*4)
+        		meta:set_string("form", "yes")
            	else
            		minetest.chat_send_player(sender:get_player_name(), "Vous n'etes pas proprietaire de cette boutique !")
             end
