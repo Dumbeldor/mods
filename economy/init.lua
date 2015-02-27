@@ -278,8 +278,7 @@ end,
             	 meta:set_string("formspec", "size[4,5;]"..
                     "label[0,0;Votre boutique a bien ete supprime !]")
            	else
-           		meta:set_string("formspec", "size[4,5;]"..
-                    "label[0,0;Vous n'etes pas proprietaire de cette boutique !]")
+           		minetest.chat_send_player(sender, "Vous n'etes pas proprietaire de cette boutique !")
             end
             
         elseif meta:get_string("form") == "yes" then
