@@ -131,7 +131,7 @@ minetest.register_node("handmill:handmill", {
 	if( anz_left > 0 ) then
 	  minetest.chat_send_player( name, S('Vous avez moulu %s grains de ble (%s restants).'):format(anz,anz_left));
 	else
-	  minetest.chat_send_player( name, S('Vous avez moulu les %s dernières graines de ble.'):format(anz));
+	  minetest.chat_send_player( name, S('Vous avez moulu les %s dernieres graines de ble.'):format(anz));
 	end
 	-- Si la version de minetest est recente, on fait tourner le moulin
 	if( minetest.swap_node ) then
