@@ -46,11 +46,11 @@ end
 
 loadEconomy()
 
+dofile(minetest.get_modpath("economy").."/actionAjouterArgent.lua")
+
 minetest.register_on_joinplayer(function(player)
 	changeMess(player:get_player_name())
 end)
-
-dofile(minetest.get_modpath("economy").."/actionAjouterArgent.lua")
 
 
 
