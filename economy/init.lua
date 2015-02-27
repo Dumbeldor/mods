@@ -55,6 +55,10 @@ function save_accounts()
     end
     io.close(output)
 end
+function init_money(name, amount)
+	argents[name] = {argent = amount}
+	save_accounts()
+end
 function set_money(name, amount)
     argents[name].argent = amount
     save_accounts()
@@ -92,7 +96,7 @@ function changeMess(pseudo)
 end
 
 minetest.register_on_newplayer(function(player)
-	set_money(player:get_player_name(), 200)
+	init_money(player:get_player_name(), 200)
 	changeMess(player:get_player_name())
 end)
 
