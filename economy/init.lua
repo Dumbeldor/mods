@@ -273,9 +273,14 @@ end,
     on_receive_fields = function(pos, formname, fields, sender)
         local meta = minetest.env:get_meta(pos)
         if fields["supprimer"] then
+        	if meta:get_string("owner") == sender:get_player_name() then
             	minetest.remove_node(pos)
             	 meta:set_string("formspec", "size[4,5;]"..
                     "label[0,0;Votre boutique a bien ete supprime !]")
+           	else
+           		meta:set_string("formspec", "size[4,5;]"..
+                    "label[0,0;Vous n'etes pas proprietaire de cette boutique !]")
+            end
             
         elseif meta:get_string("form") == "yes" then
         	-- (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"])
