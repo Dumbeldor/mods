@@ -48,10 +48,7 @@ loadEconomy()
 
 dofile(minetest.get_modpath("economy").."/actionAjouterArgent.lua")
 
-minetest.register_on_newplayer(function(player)
-	set_money(player:get_player_name(), 200)
-	changeMess(player:get_player_name())
-end)
+
 
 
 
