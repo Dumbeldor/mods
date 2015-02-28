@@ -372,7 +372,7 @@ end,
                 	minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
                 	sonsErreur(sender_name)
                 	return true
-                elseif not blocName[1] ~= "" then
+                elseif blocName[1] ~= "" then
                 	minetest.chat_send_player(sender_name, "La boutique semble vide !")
                 	sonsErreur(sender_name)
                 	minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
@@ -414,7 +414,7 @@ end,
     	            minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
         	        sonsErreur(sender_name)
             	    return true
-            	elseif not blocName[1] ~= "" then
+            	elseif blocName[1] ~= "" then
             		minetest.chat_send_player(sender_name, "La boutique semble vide !")
     	            sonsErreur(sender_name)
     	            minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
