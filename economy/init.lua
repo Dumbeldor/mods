@@ -372,11 +372,6 @@ end,
                 	minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
                 	sonsErreur(sender_name)
                 	return true
-                elseif blocName[1] ~= "" then
-                	minetest.chat_send_player(sender_name, "La boutique semble vide !")
-                	sonsErreur(sender_name)
-                	minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
-                	return true
             	end
             	set_money(sender_name, get_money(sender_name) - meta:get_string("costsell"))
             	set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) + meta:get_string("costsell"))
@@ -414,11 +409,6 @@ end,
     	            minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
         	        sonsErreur(sender_name)
             	    return true
-            	elseif blocName[1] ~= "" then
-            		minetest.chat_send_player(sender_name, "La boutique semble vide !")
-    	            sonsErreur(sender_name)
-    	            minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
-                return true
 	            end
     	        set_money(sender_name, get_money(sender_name) + meta:get_string("costbuy"))
         	    set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) - meta:get_string("costbuy"))
@@ -438,7 +428,7 @@ end,
         	end
 
         else
-        	if not meta:get_string("form") == "yes" then
+        	if meta:get_string("form") == "yes" then
         	minetest.chat_send_player(sender:get_player_name(), "Il n'y a plus rien dans la boutique, contacter le gérant de cette boutique pour avoir plus de renseignement : " .. meta:get_string("owner") .. ".")
         	minetest.chat_send_player(meta:get_string("owner"), sender:get_player_name() .. " a essaye d'acheter dans votre boutique mais il semblerait qu'elle soit vide...")
         	sonsErreur(sender:get_player_name())
