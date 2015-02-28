@@ -8,10 +8,6 @@ local idx
 --Chargé les functions 
 
 
-
-
-
-
 local function loadEconomy()
     local input = io.open(homes_file, "r")
     if input then
@@ -95,7 +91,7 @@ minetest.register_chatcommand("pay", {
 		else
 
 			if argents[player:get_player_name()] then
-				if not tonumber(param[2]) then
+				if tonumber(param[2]) then
 					argents[player:get_player_name()].argent = argents[player:get_player_name()].argent - param[2];
 					if argents[player:get_player_name()].argent >= 0 then
 						if argents[param[1]] then

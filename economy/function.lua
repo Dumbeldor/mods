@@ -40,7 +40,7 @@ function changeMess(pseudo)
 		position = {x = 1, y = 0},
 		offset = {x=-100, y = 20},
 		scale = {x = 100, y = 100},
+		number = 0xCACA00,
 		text = "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney
-	})
-	
+	})	
 end
