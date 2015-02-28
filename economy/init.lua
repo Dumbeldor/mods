@@ -372,8 +372,11 @@ end,
                 	minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
                 	sonsErreur(sender_name)
                 	return true
-                elseif blocName[1] ~= "" then
-                	minetest.chat_send_player(sender_name, "c'est vide....")
+                elseif not blocName[1] ~= "" then
+                	minetest.chat_send_player(sender_name, "La boutique semble vide !")
+                	sonsErreur(sender_name)
+                	minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
+                	return true
             	end
             	set_money(sender_name, get_money(sender_name) - meta:get_string("costsell"))
             	set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) + meta:get_string("costsell"))
@@ -411,6 +414,11 @@ end,
     	            minetest.chat_send_player(sender_name, "Le compte du proprietaire du shop n'existe pas... Essayez plus tard ou/et contactez un Administrateur !")
         	        sonsErreur(sender_name)
             	    return true
+            	elseif not blocName[1] ~= "" then
+            		minetest.chat_send_player(sender_name, "La boutique semble vide !")
+    	            sonsErreur(sender_name)
+    	            minetest.chat_send_player(meta:get_string("owner"), "Une de vos boutique semble vide !")
+                return true
 	            end
     	        set_money(sender_name, get_money(sender_name) + meta:get_string("costbuy"))
         	    set_money(meta:get_string("owner"), get_money(meta:get_string("owner")) - meta:get_string("costbuy"))
