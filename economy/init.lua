@@ -289,7 +289,14 @@ end,
         local inv = meta:get_inventory()
         local blocDansInv = inv:get_list("main")
         local blocName = explode(" ", blocDansInv[1]:to_string())
-        if blocDansInv[1]:to_string() ~= "" then          
+        if not (blocDansInv[1]:to_string() ~= "") then
+        	if not(meta:get_string("form") == "yes") then
+        		minetest.chat_send_player(sender:get_player_name(), "Il n'y a plus rien dans la boutique, contacter le gérant de cette boutique pour avoir plus de renseignement : " .. meta:get_string("owner") .. ".")
+        		minetest.chat_send_player(meta:get_string("owner"), sender:get_player_name() .. " a essaye d'acheter dans votre boutique mais il semblerait qu'elle soit vide...")
+        		sonsErreur(sender:get_player_name())
+        		sonsErreur(meta:get_string("owner"))
+        	end
+        else          
         	if meta:get_string("form") == "yes" then
         		-- (meta:get_string("owner") == sender:get_player_name() or minetest.get_player_privs(sender:get_player_name())["money_admin"])
             	if fields.shopname ~= "" and (fields.action == "A" or fields.action == "V" or fields.action == "AV") and tonumber(fields.amount) and tonumber(fields.amount) >= 1 and meta:get_string("owner") == sender:get_player_name() then
@@ -426,14 +433,6 @@ end,
 							end
 						end
         	end
-
-        else
-        	if meta:get_string("form") == "yes" then
-        	minetest.chat_send_player(sender:get_player_name(), "Il n'y a plus rien dans la boutique, contacter le gérant de cette boutique pour avoir plus de renseignement : " .. meta:get_string("owner") .. ".")
-        	minetest.chat_send_player(meta:get_string("owner"), sender:get_player_name() .. " a essaye d'acheter dans votre boutique mais il semblerait qu'elle soit vide...")
-        	sonsErreur(sender:get_player_name())
-        	sonsErreur(meta:get_string("owner"))
-        end
         end
     end,
 
