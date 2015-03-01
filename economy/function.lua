@@ -44,3 +44,33 @@ function changeMess(pseudo)
 		text = "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney
 	})	
 end
+
+local function loadEconomy()
+    local input = io.open(homes_file, "r")
+    if input then
+		repeat
+            local x = input:read("*n")
+            if x == nil then
+            	break
+            end
+            local name = input:read("*l")
+            argents[name:sub(2)] = {argent = x}
+        until input:read(0) == nil
+        io.close(input)
+    else
+        argents = {}
+    end
+end
+
+
+function explode(div,str)
+  if (div=='') then return false end
+  local pos,arr = 0,{}
+  -- for each divider found
+  for st,sp in function() return string.find(str,div,pos,true) end do
+    table.insert(arr,string.sub(str,pos,st-1))
+    pos = sp + 1 
+  end
+  table.insert(arr,string.sub(str,pos)) 
+  return arr
+end
