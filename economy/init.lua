@@ -3,6 +3,7 @@ homes_file = minetest.get_worldpath() .. "/economy"
 argents = {}
 nomMoney = " Francs"
 argentBase=200
+idx 
 
 --Chargé les functions 
 
@@ -46,15 +47,15 @@ dofile(minetest.get_modpath("economy").."/actionAjouterArgent.lua")
 
 minetest.register_on_newplayer(function(player)
 	init_money(player:get_player_name(), 200)
-	changeMess(player:get_player_name())
+	init(player:get_player_name())
 end)
 
 minetest.register_on_joinplayer(function(player)
 	if argents[player:get_player_name()] then
-		changeMess(player:get_player_name())
+		init(player:get_player_name())
 	else
 		init_money(player:get_player_name(), 200)
-		changeMess(player:get_player_name())
+		init(player:get_player_name())
 	end
 end)
 
