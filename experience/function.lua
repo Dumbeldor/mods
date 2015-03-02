@@ -19,12 +19,37 @@ function loadExperience()
             if list[1] == nil then
             	break
             end
-            local pseudo = list[1]
-            faction[pseudo] = {xp = string.sub(ligne, string.len(pseudo)+2)}
-            print(string.sub(ligne, string.len(pseudo)+2))
+            local pseudo = list[2]
+            experience[pseudo] = {xp = list[1]}
+            print(string.sub(ligne, list[1]))
         until input:read(0) == nil
         io.close(input)
     else
-        faction = {}
+        experience = {}
     end
+end
+
+function saveXp()
+  local output = io.open(homes_file, "w")
+  for i, v in pairs(experience) do
+    output:write(v.xp.." "..i.."\n")
+  end
+  io.close(output)
+end
+
+function initXp(pseudo)
+  experience[pseudo] = {xp = 0}
+  saveXp()
+end
+
+function setXp(pseudo, amount)
+  experience[pseudo].xp = amount
+end
+
+function getXp(pseudo)
+  return experience[pseudo].xp
+end
+
+function exist(pseudo)
+  return experience[pseudo] ~= nil
 end

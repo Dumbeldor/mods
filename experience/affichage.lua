@@ -7,6 +7,6 @@ function afficher(pseudo)
 		offset = {x=-100, y = 50},
 		scale = {x = 100, y = 100},
 		number = 0xCACA00,
-		text = "Vous etes lvl 100 !"
+		text = "Vous etes lvl ".. getXp(pseudo)
 	})	
 end
