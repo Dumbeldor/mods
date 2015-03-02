@@ -136,6 +136,8 @@ minetest.register_chatcommand("pay", {
 	Création des blocks !
 ...]]
 
+--[[ 
+
 minetest.register_craftitem("economy:pences", {
 	description = "Minetoon pence",
 	inventory_image = "goldcoin.png",
@@ -151,9 +153,11 @@ minetest.register_craftitem("economy:pounds", {
 	inventory_image = "81goldcoin.png",
 })
 
+...]]
 
 
-minetest.register_node("economy:buy", {
+
+minetest.register_node("economy:boutique", {
 	description = "Utiliser pour vendre des objets",
 	tiles = {
 		"iron.png",
@@ -171,8 +175,6 @@ minetest.register_node("economy:buy", {
     end,
 
 on_construct = function(pos)
-    -- Shop buys at costbuy
-    -- Shop sells at costsell
         local meta = minetest.env:get_meta(pos)
         local inv = meta:get_inventory()
          meta:set_string("formspec", "size[8,8]"..

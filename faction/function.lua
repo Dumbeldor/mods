@@ -10,7 +10,7 @@ function explode(div,str)
   return arr
 end
 
-function loadEconomy()
+function loadFaction()
     local input = io.open(fileList, "r")
     if input then
 		repeat
