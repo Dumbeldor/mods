@@ -420,7 +420,7 @@ end,
             	sender_inv:remove_item("main", blocName[1] .. " " .. meta:get_string("amount"))
 	            inv:add_item("main", blocName[1] .. " " .. meta:get_string("amount"))
     	        minetest.chat_send_player(sender_name, "Vous avez vendu " .. meta:get_string("amount") .. " " .. blocName[1] .. " pour " .. meta:get_string("costbuy") .. " " .. nomMoney .. ".")
-        	    minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a vendu " .. meta:get_string("amount") .. " " .. blocName[1] .. " pour " .. meta:get_string("costsell") .. " " .. nomMoney .. ".")
+        	    minetest.chat_send_player(meta:get_string("owner"), sender_name .. " vous a vendu " .. meta:get_string("amount") .. " " .. blocName[1] .. " pour " .. meta:get_string("costbuy") .. " " .. nomMoney .. ".")
 	            sonsReussis(sender_name)
     	        sonsReussis(meta:get_string("owner"))
         	    changeMess(sender_name)	
