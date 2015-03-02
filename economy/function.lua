@@ -48,7 +48,7 @@ end
 
 function changeMess(pseudo)
 	local player = minetest.get_player_by_name(pseudo)
-	player:hud_change(idx, "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney)
+	player:hud_change(idx, "text", "Salut " .. player:get_player_name() .. "\n" .. "Portefeuille :".. argents[player:get_player_name()].argent .. nomMoney)
 end
 
 local function loadEconomy()
