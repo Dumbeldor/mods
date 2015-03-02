@@ -3,7 +3,7 @@ homes_file = minetest.get_worldpath() .. "/economy"
 argents = {}
 nomMoney = " Francs"
 argentBase=200
-idx 
+local idx 
 
 --Chargé les functions 
 
