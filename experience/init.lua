@@ -5,7 +5,7 @@ experience{}
 --Chargé les fonctions
 --dofile(minetest.get_modpath("experience").."/function.lua")
 
-loadExperience()
+--loadExperience()
 
 --dofile(minetest.get_modpath("experience").."/affichage.lua")
 
