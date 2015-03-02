@@ -35,7 +35,7 @@ end
 function changeMess(pseudo)
 	local player = minetest.get_player_by_name(pseudo)
 	player:hud_remove(idx)
-	idx = player:hud_add({
+	local idx = player:hud_add({
 		hud_elem_type = "text",
 		position = {x = 1, y = 0},
 		offset = {x=-100, y = 20},
