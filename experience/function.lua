@@ -10,6 +10,7 @@ function explode(div,str)
   return arr
 end
 
+--Chargement de l'xp
 function loadExperience()
     local input = io.open(homes_file, "r")
     if input then
