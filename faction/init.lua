@@ -9,3 +9,4 @@ player = {}
 --Chargement
 dofile(minetest.get_modpath("faction").."/function.lua")
 loadEconomy()
+dofile(minetest.get_modpath("faction").."/commande.lua")
